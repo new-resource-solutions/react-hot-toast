@@ -62,29 +62,43 @@ toast.remove = (toastId?: string) =>
 toast.promise = <T>(
   promise: Promise<T>,
   msgs: {
-    loading: Renderable;
-    success: ValueOrFunction<Renderable, T>;
-    error: ValueOrFunction<Renderable, any>;
+    loading?: Renderable;
+    success?: ValueOrFunction<Renderable, T>;
+    error?: ValueOrFunction<Renderable, any>;
   },
   opts?: DefaultToastOptions
 ) => {
-  const id = toast.loading(msgs.loading, { ...opts, ...opts?.loading });
+  const id = msgs.loading === undefined ? undefined : toast.loading(msgs.loading, { ...opts, ...opts?.loading });
 
   promise
     .then((p) => {
-      toast.success(resolveValue(msgs.success, p), {
-        id,
-        ...opts,
-        ...opts?.success,
-      });
+      const value = resolveValue(msgs.success, p);
+      if (value === undefined) {
+        if (id !== undefined) {
+          toast.dismiss(id);
+        }
+      } else {
+        toast.success(value, {
+          id,
+          ...opts,
+          ...opts?.success,
+        });
+      }
       return p;
     })
     .catch((e) => {
-      toast.error(resolveValue(msgs.error, e), {
-        id,
-        ...opts,
-        ...opts?.error,
-      });
+      const value = resolveValue(msgs.error, e);
+      if (value === undefined) {
+        if (id !== undefined) {
+          toast.dismiss(id);
+        }
+      } else {
+        toast.error(value, {
+          id,
+          ...opts,
+          ...opts?.error,
+        });
+      }
     });
 
   return promise;
