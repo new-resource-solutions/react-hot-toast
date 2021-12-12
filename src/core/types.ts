@@ -9,7 +9,7 @@ export type ToastPosition =
   | 'bottom-center'
   | 'bottom-right';
 
-export type Renderable = JSX.Element | string | null;
+export type Renderable = JSX.Element | string | null | undefined;
 
 export interface IconTheme {
   primary: string;
@@ -70,5 +70,7 @@ export type ToastOptions = Partial<
 
 export type DefaultToastOptions = ToastOptions &
   {
-    [key in ToastType]?: ToastOptions;
+    [key in ToastType]?: ToastOptions & {
+      disabled?: boolean;
+    };
   };
